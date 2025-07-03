@@ -1,95 +1,211 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import React, { useState, useEffect } from "react";
+import { Box, Button, Card, Grid, Paper, Typography } from "@mui/material";
+import { styled } from '@mui/material/styles';
+import { useRouter } from "next/navigation";
+import __url from "../lib/const"; // Assuming this path is correct for your project
+import { useAccessToken } from './context/TokenContext'; // Assuming this path is correct
+import { useUser } from "@auth0/nextjs-auth0";
+import axios from "axios";
 
+/**
+ * Home Component
+ *
+ * This component serves as a user confirmation page after authentication.
+ * It displays the user's name and email, and provides options to confirm
+ * identity or log out.
+ *
+ * It is styled to align with Material-UI v7 aesthetics, ensuring content
+ * centering, responsive design, and enhanced visual elements.
+ *
+ * @returns {JSX.Element} The Home component.
+ */
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  // Styled component for generic Paper items (not directly used in this specific layout,
+  // but kept as it was in the original snippet, useful for other parts of your app).
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  }));
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
+  // Auth0 hook to get user information and loading state
+  const { user, isLoading } = useUser();
+  // Custom hook to get the access token
+  const token = useAccessToken();
+  // Next.js router hook for navigation
+  const router = useRouter();
+
+  // Display a loading indicator while user data is being fetched
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-12 md:p-24">
+        <Typography variant="h6" color="text.secondary">
+          Cargando información de usuario...
+        </Typography>
       </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    );
+  }
+
+  /**
+   * Handles the login confirmation.
+   * It validates the user's role by making an API call and
+   * redirects them based on their role (admin or student).
+   */
+  async function handleLogin() {
+    try {
+      // Make an API call to validate the user's role, including the access token
+      const response = await axios.get(`${__url}/user/validate/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log(response.data); // Log the response for debugging
+
+      // Redirect based on the user's role
+      if (response.data?.user === 'admin') {
+        router.push("/main"); // Redirect to admin dashboard
+      } else if (response.data?.user === 'student') {
+        router.push("/student"); // Redirect to student dashboard
+      }
+    } catch (error) {
+      // Log any errors that occur during the login process
+      console.error("Login error:", error);
+      // Optionally, display an error message to the user
+      // For example, using a Snackbar or a custom modal
+    }
+  }
+
+  return (
+    <>
+      {/* Set page title and meta description for SEO */}
+      <title>Confirmación de usuario</title>
+      <meta name="description" content="Confirme su identidad para acceder al sistema de seguimientos académicos UV." />
+
+      {/* Render content only if user data is available (not loading) */}
+      {user && (
+        // Main container for the page, centered vertically and horizontally.
+        // Uses Tailwind CSS classes for responsive padding and centering.
+        <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-12 md:p-24">
+          {/* Box component acts as a flexible wrapper for the Paper component,
+              controlling its maximum width on larger screens for better readability. */}
+          <Box sx={{ maxWidth: '450px', width: '100%', mx: 'auto' }}>
+            {/* Paper component provides a distinct, elevated surface for the form.
+                - `elevation={6}` for a pronounced shadow.
+                - `sx` for responsive padding, rounded corners, and enhanced shadow. */}
+            <Paper
+              elevation={6}
+              sx={{
+                p: { xs: 4, md: 6 }, // Responsive padding
+                borderRadius: '12px', // Rounded corners
+                textAlign: 'center', // Center text and inline elements
+                boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.15)', // Enhanced shadow
+              }}
+            >
+              {/* Grid container for arranging elements in a column.
+                  - `direction="column"` stacks items vertically.
+                  - `justifyContent="center"` centers items vertically.
+                  - `alignItems="stretch"` makes items fill the width.
+                  - `spacing={3}` adds consistent vertical spacing. */}
+              <Grid
+                container
+                direction="column"
+                justifyContent="center"
+                alignItems="stretch"
+                spacing={3} // Increased spacing
+              >
+                {/* Main title Typography */}
+                <Grid item component="div">
+                  <Typography
+                    variant="h4"
+                    component="h1"
+                    sx={{ mb: 2, fontWeight: 'bold', color: 'primary.main' }}
+                  >
+                    Sistema de Seguimiento Académico
+                  </Typography>
+                </Grid>
+
+                {/* Instruction Typography */}
+                <Grid item component="div">
+                  <Typography
+                    variant="body1"
+                    sx={{ mb: 3, color: 'text.secondary' }}
+                  >
+                    Confirme que usted es la siguiente persona:
+                  </Typography>
+                </Grid>
+
+                {/* Card displaying user information */}
+                <Grid item component="div">
+                  <Card
+                    sx={{
+                      p: 3, // Padding within the card
+                      mb: 4, // Margin below the card
+                      borderRadius: '8px', // Rounded corners for the card
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)', // Subtle shadow for the card
+                      backgroundColor: 'background.paper', // Use theme background color
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                      {user.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {user.email}
+                    </Typography>
+                  </Card>
+                </Grid>
+
+                {/* Confirm Button */}
+                <Grid item component="div">
+                  <Button
+                    variant="contained"
+                    onClick={handleLogin} // Call handleLogin function on click
+                    sx={{
+                      width: '100%',
+                      py: 1.75,
+                      fontSize: '1.15rem',
+                      borderRadius: '8px',
+                      boxShadow: '0 6px 12px rgba(0,0,0,0.2)',
+                      '&:hover': {
+                        boxShadow: '0 8px 16px rgba(0,0,0,0.25)',
+                        transform: 'translateY(-2px)',
+                      },
+                      transition: 'all 0.3s ease-in-out',
+                      mb: 2, // Margin below this button
+                    }}
+                  >
+                    Confirmar
+                  </Button>
+                </Grid>
+
+                {/* Logout Button */}
+                <Grid item component="div">
+                  <Button
+                    variant="outlined"
+                    component="a"
+                    href="/auth/logout"
+                    sx={{
+                      width: '100%',
+                      py: 1.5,
+                      fontSize: '1rem',
+                      borderRadius: '8px',
+                      borderColor: 'divider', // Use theme divider color for border
+                      color: 'text.primary', // Use theme primary text color
+                      '&:hover': {
+                        backgroundColor: 'action.hover', // Use theme hover color
+                        borderColor: 'primary.main', // Highlight border on hover
+                      },
+                      transition: 'all 0.3s ease-in-out',
+                    }}
+                  >
+                    No soy {user.name}
+                  </Button>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Box>
+        </main>
+      )}
+    </>
   );
 }
