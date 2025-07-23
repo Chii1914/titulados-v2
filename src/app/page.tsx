@@ -1,28 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Box, Button, Card, Grid, Paper, Typography } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { useRouter } from "next/navigation";
-import __url from "../lib/const"; // Assuming this path is correct for your project
-import { useAccessToken } from './context/TokenContext'; // Assuming this path is correct
+import __url from "../lib/const";
+import { useAccessToken } from './context/TokenContext';
 import { useUser } from "@auth0/nextjs-auth0";
 import axios from "axios";
 
-/**
- * Home Component
- *
- * This component serves as a user confirmation page after authentication.
- * It displays the user's name and email, and provides options to confirm
- * identity or log out.
- *
- * It is styled to align with Material-UI v7 aesthetics, ensuring content
- * centering, responsive design, and enhanced visual elements.
- *
- * @returns {JSX.Element} The Home component.
- */
 export default function Home() {
-  // Styled component for generic Paper items (not directly used in this specific layout,
-  // but kept as it was in the original snippet, useful for other parts of your app).
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -31,14 +17,10 @@ export default function Home() {
     color: theme.palette.text.secondary,
   }));
 
-  // Auth0 hook to get user information and loading state
   const { user, isLoading } = useUser();
-  // Custom hook to get the access token
   const token = useAccessToken();
-  // Next.js router hook for navigation
   const router = useRouter();
 
-  // Display a loading indicator while user data is being fetched
   if (isLoading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-12 md:p-24">
@@ -49,72 +31,60 @@ export default function Home() {
     );
   }
 
-  /**
-   * Handles the login confirmation.
-   * It validates the user's role by making an API call and
-   * redirects them based on their role (admin or student).
-   */
   async function handleLogin() {
     try {
-      // Make an API call to validate the user's role, including the access token
-      const response = await axios.get(`${__url}/user/validate/`, {
+      const response = await axios.get(`${__url}/user/validate`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log(response.data); // Log the response for debugging
-
-      // Redirect based on the user's role
-      if (response.data?.user === 'admin') {
-        router.push("/main"); // Redirect to admin dashboard
-      } else if (response.data?.user === 'student') {
-        router.push("/student"); // Redirect to student dashboard
+      console.log(response.data.user);
+      if (response.data.user) {
+        switch (response.data.user) {
+          case 'estudiante':
+            router.push("/estudiante");
+            break;
+          case 'profesor':
+            router.push("/profesor");
+            break;
+          case 'secretario':
+            router.push("/secretario");
+            break;
+          case 'jefatura':
+            router.push("/jefatura");
+            break;
+          default:
+            console.error("Unknown role", response.data.role);
+        }
+      } else {
+        console.error("error", response.data)
       }
     } catch (error) {
-      // Log any errors that occur during the login process
       console.error("Login error:", error);
-      // Optionally, display an error message to the user
-      // For example, using a Snackbar or a custom modal
     }
   }
 
   return (
     <>
-      {/* Set page title and meta description for SEO */}
       <title>Confirmación de usuario</title>
       <meta name="description" content="Confirme su identidad para acceder al sistema de seguimientos académicos UV." />
-
-      {/* Render content only if user data is available (not loading) */}
       {user && (
-        // Main container for the page, centered vertically and horizontally.
-        // Uses Tailwind CSS classes for responsive padding and centering.
         <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-12 md:p-24">
-          {/* Box component acts as a flexible wrapper for the Paper component,
-              controlling its maximum width on larger screens for better readability. */}
           <Box sx={{ maxWidth: '450px', width: '100%', mx: 'auto' }}>
-            {/* Paper component provides a distinct, elevated surface for the form.
-                - `elevation={6}` for a pronounced shadow.
-                - `sx` for responsive padding, rounded corners, and enhanced shadow. */}
             <Paper
               elevation={6}
               sx={{
-                p: { xs: 4, md: 6 }, // Responsive padding
-                borderRadius: '12px', // Rounded corners
-                textAlign: 'center', // Center text and inline elements
-                boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.15)', // Enhanced shadow
+                p: { xs: 4, md: 6 },
+                borderRadius: '12px',
+                textAlign: 'center',
+                boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.15)',
               }}
             >
-              {/* Grid container for arranging elements in a column.
-                  - `direction="column"` stacks items vertically.
-                  - `justifyContent="center"` centers items vertically.
-                  - `alignItems="stretch"` makes items fill the width.
-                  - `spacing={3}` adds consistent vertical spacing. */}
               <Grid
                 container
                 direction="column"
                 justifyContent="center"
                 alignItems="stretch"
-                spacing={3} // Increased spacing
+                spacing={3}
               >
-                {/* Main title Typography */}
                 <Grid component="div">
                   <Typography
                     variant="h4"
@@ -124,8 +94,6 @@ export default function Home() {
                     Sistema de titulados UV
                   </Typography>
                 </Grid>
-
-                {/* Instruction Typography */}
                 <Grid component="div">
                   <Typography
                     variant="body1"
@@ -134,16 +102,14 @@ export default function Home() {
                     Confirme que usted es la siguiente persona:
                   </Typography>
                 </Grid>
-
-                {/* Card displaying user information */}
                 <Grid component="div">
                   <Card
                     sx={{
-                      p: 3, // Padding within the card
-                      mb: 4, // Margin below the card
-                      borderRadius: '8px', // Rounded corners for the card
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)', // Subtle shadow for the card
-                      backgroundColor: 'background.paper', // Use theme background color
+                      p: 3,
+                      mb: 4,
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      backgroundColor: 'background.paper',
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 'medium', mb: 0.5 }}>
@@ -154,12 +120,10 @@ export default function Home() {
                     </Typography>
                   </Card>
                 </Grid>
-
-                {/* Confirm Button */}
                 <Grid component="div">
                   <Button
                     variant="contained"
-                    onClick={handleLogin} // Call handleLogin function on click
+                    onClick={handleLogin}
                     sx={{
                       width: '100%',
                       py: 1.75,
@@ -171,14 +135,12 @@ export default function Home() {
                         transform: 'translateY(-2px)',
                       },
                       transition: 'all 0.3s ease-in-out',
-                      mb: 2, // Margin below this button
+                      mb: 2,
                     }}
                   >
                     Confirmar
                   </Button>
                 </Grid>
-
-                {/* Logout Button */}
                 <Grid component="div">
                   <Button
                     variant="outlined"
@@ -189,11 +151,11 @@ export default function Home() {
                       py: 1.5,
                       fontSize: '1rem',
                       borderRadius: '8px',
-                      borderColor: 'divider', // Use theme divider color for border
-                      color: 'text.primary', // Use theme primary text color
+                      borderColor: 'divider',
+                      color: 'text.primary',
                       '&:hover': {
-                        backgroundColor: 'action.hover', // Use theme hover color
-                        borderColor: 'primary.main', // Highlight border on hover
+                        backgroundColor: 'action.hover',
+                        borderColor: 'primary.main',
                       },
                       transition: 'all 0.3s ease-in-out',
                     }}

@@ -39,14 +39,13 @@ export default function UserRoleSelection() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-12 md:p-24 bg-blue-50">
-      <Box sx={{ maxWidth: '960px', width: '100%', mx: 'auto', height: 'auto' }}>
+      <Box sx={{ display: 'column', maxWidth: '960px', width: '100%', mx: 'auto', height: 'auto' }}>
         <Paper
           elevation={4}
           sx={{
-            p: { xs: 3, md: 4 },
+            p: { xs: 1, md: 2 },
             borderRadius: '16px',
             textAlign: 'center',
-            mb: { xs: 4, md: 6 },
             boxShadow: '0px 8px 25px rgba(0, 0, 0, 0.1)',
             background: 'linear-gradient(145deg, #ffffff, #f0f8ff)',
           }}
@@ -64,51 +63,43 @@ export default function UserRoleSelection() {
             Seleccione su perfil para ingresar al sistema.
           </Typography>
         </Paper>
-        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
           {userProfiles.map((profile) => (
-            <Grid key={profile.id} display="flex" size={{ xs: 2, sm: 4, md: 4 }}>
               <Link href={profile.link} underline="none" color="inherit">
                 <Paper
                   elevation={8}
                   sx={{
                     p: 4,
-                  borderRadius: '20px',
-                  textAlign: 'center',
-                  height: '100%',
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  transition: 'all 0.4s cubic-bezier(.25,.8,.25,1)',
-                  cursor: 'pointer',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-
-                  '&:hover': {
-                    boxShadow: '0 15px 40px rgba(0,0,0,0.2)',
-                    transform: 'translateY(-8px) scale(1.02)',
-                  },
-                }}
-              >
-                <profile.icon sx={{ fontSize: 60, mb: 2, color: '#2196f3' }} />
-                <Typography
-                  variant="h6"
-                  component="h2"
-                  sx={{ mb: 1, fontWeight: 'bold', color: '#424242' }}
+                    borderRadius: '20px',
+                    textAlign: 'center',
+                    marginTop: '15px',
+                    height: '100%',
+                    display: 'column',
+                    transition: 'all 0.4s cubic-bezier(.25,.8,.25,1)',
+                    cursor: 'pointer',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                    '&:hover': {
+                      boxShadow: '0 15px 40px rgba(0,0,0,0.2)',
+                      transform: 'translateY(-8px) scale(1.02)',
+                    },
+                  }}
                 >
-                  {profile.title}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: '#757575' }}
-                >
-                  {profile.description}
-                </Typography>
-              </Paper>
-            </Link>
-            </Grid>
+                  <profile.icon sx={{ fontSize: 60, mb: 2, color: '#2196f3' }} />
+                  <Typography
+                    variant="h6"
+                    component="h2"
+                    sx={{ mb: 1, fontWeight: 'bold', color: '#424242' }}
+                  >
+                    {profile.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: '#757575' }}
+                  >
+                    {profile.description}
+                  </Typography>
+                </Paper>
+              </Link>
           ))}
-        </Grid>
       </Box>
     </main>
   );
