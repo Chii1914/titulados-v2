@@ -115,18 +115,18 @@ export default function Home() {
                 spacing={3} // Increased spacing
               >
                 {/* Main title Typography */}
-                <Grid item component="div">
+                <Grid component="div">
                   <Typography
                     variant="h4"
                     component="h1"
                     sx={{ mb: 2, fontWeight: 'bold', color: 'primary.main' }}
                   >
-                    Sistema de Seguimiento Académico
+                    Sistema de titulados UV
                   </Typography>
                 </Grid>
 
                 {/* Instruction Typography */}
-                <Grid item component="div">
+                <Grid component="div">
                   <Typography
                     variant="body1"
                     sx={{ mb: 3, color: 'text.secondary' }}
@@ -136,7 +136,7 @@ export default function Home() {
                 </Grid>
 
                 {/* Card displaying user information */}
-                <Grid item component="div">
+                <Grid component="div">
                   <Card
                     sx={{
                       p: 3, // Padding within the card
@@ -156,7 +156,7 @@ export default function Home() {
                 </Grid>
 
                 {/* Confirm Button */}
-                <Grid item component="div">
+                <Grid component="div">
                   <Button
                     variant="contained"
                     onClick={handleLogin} // Call handleLogin function on click
@@ -179,7 +179,7 @@ export default function Home() {
                 </Grid>
 
                 {/* Logout Button */}
-                <Grid item component="div">
+                <Grid component="div">
                   <Button
                     variant="outlined"
                     component="a"
