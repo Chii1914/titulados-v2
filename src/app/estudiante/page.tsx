@@ -28,7 +28,7 @@ export default function Estudiantes() {
             console.log('Enviando archivo:', fichaInscripcionFile.name);
             const formData = new FormData();
             formData.append('file', fichaInscripcionFile); 
-
+/*
             try {
                 const response = await fetch(`${__url}/api/upload-ficha`, {
                     method: 'POST',
@@ -50,7 +50,7 @@ export default function Estudiantes() {
             } catch (error) {
                 console.error('Error de red al enviar el archivo:', error);
                 alert('Error de red al enviar el archivo.'); // Using alert for simplicity
-            }
+            */
         } else {
             console.warn('No hay archivo para enviar.');
         }
