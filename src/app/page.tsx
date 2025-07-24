@@ -91,7 +91,7 @@ export default function Home() {
                     component="h1"
                     sx={{ mb: 2, fontWeight: 'bold', color: 'primary.main' }}
                   >
-                    Sistema de titulados UV
+                    Sistema de Seminario de Título UV
                   </Typography>
                 </Grid>
                 <Grid component="div">
