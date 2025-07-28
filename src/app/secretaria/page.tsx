@@ -28,7 +28,7 @@ import HomeIcon from '@mui/icons-material/Home';               // For Inicio (Da
 // Import your existing components that will be displayed in the dashboard
 import Archivos from './components/archivos';
 import Asignaciones from './components/asignaciones';
-//import Estudiantes from './estudiantes';
+import Estudiantes from './components/estudiantes';
 //import Notificaciones from './notificaciones';
 //import Profesores from './profesores';
 import Inicio from './components/inicio'; // Assuming this is your dashboard overview component
@@ -57,7 +57,7 @@ const EstudiantesPage = () => (
     <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>Directorio de Estudiantes</Typography>
         <Typography variant="body1">Accede a la información de los estudiantes.</Typography>
-         {/*<Estudiantes /> {/* If Estudiantes.tsx contains the actual component */}
+        <Estudiantes /> {/* If Estudiantes.tsx contains the actual component */}
     </Box>
 );
 
