@@ -1,3 +1,4 @@
+// src/app/docente/page.tsx
 "use client";
 import * as React from 'react';
 import Box from '@mui/material/Box';
@@ -12,44 +13,60 @@ import InformanteContent from './components/informante';
 import SecretarioContent from './components/secretario';
 import PresidenteContent from './components/presidente';
 import { Typography } from '@mui/material';
+import { GridRowsProp } from '@mui/x-data-grid';
+
+// Interfaz para los datos
+interface FilaGrid {
+  id: number;
+  nombreAcademico: string;
+  rol: 'Guía' | 'Informante' | 'Presidente' | 'Secretario';
+  estudianteAsignado: string;
+  archivoTesis: File | null;
+  fechaAsignacion: Date;
+}
+
+// Datos de ejemplo para todos los roles
+const filasCompletas: GridRowsProp<FilaGrid> = [
+  { id: 1, nombreAcademico: 'Dr. Juan Pérez', rol: 'Guía', estudianteAsignado: 'Ana Gómez', archivoTesis: null, fechaAsignacion: new Date('2024-07-28T10:00:00') },
+  { id: 2, nombreAcademico: 'Dr. Juan Pérez', rol: 'Informante', estudianteAsignado: 'Carlos Ruiz', archivoTesis: new File([], "tesis_carlos.pdf"), fechaAsignacion: new Date('2024-07-29T14:30:00') },
+  { id: 3, nombreAcademico: 'Dra. María López', rol: 'Guía', estudianteAsignado: 'Sofía Castro', archivoTesis: new File([], "tesis_sofia.pdf"), fechaAsignacion: new Date('2024-07-20T09:00:00') },
+  { id: 4, nombreAcademico: 'Dra. María López', rol: 'Informante', estudianteAsignado: 'Luis Jara', archivoTesis: new File([], "tesis_luis.pdf"), fechaAsignacion: new Date('2024-07-30T11:00:00') },
+  { id: 5, nombreAcademico: 'Dr. Carlos Soto', rol: 'Presidente', estudianteAsignado: 'Marta Díaz', archivoTesis: new File([], "tesis_marta.pdf"), fechaAsignacion: new Date('2024-08-01T15:00:00') },
+  { id: 6, nombreAcademico: 'Dra. Ana Torres', rol: 'Secretario', estudianteAsignado: 'Pedro Vera', archivoTesis: new File([], "tesis_pedro.pdf"), fechaAsignacion: new Date('2024-08-02T12:00:00') },
+];
+
 
 export default function CustomBottomNavigation() {
   const [value, setValue] = React.useState(0);
-  const presidenteColumns = [
-    { field: 'id', headerName: 'ID Decisión', width: 90 },
-    { field: 'decision', headerName: 'Decisión', width: 300, editable: true },
-    { field: 'dateIssued', headerName: 'Fecha Emisión', width: 150, editable: true },
-  ];
-  const presidenteRows = [
-    { id: 1, decision: 'Aprobación presupuesto 2026', dateIssued: '2025-07-23' },
-    { id: 2, decision: 'Nombramiento de comité', dateIssued: '2025-07-18' },
-    { id: 3, decision: 'Plan estratégico Q4', dateIssued: '2025-07-10' },
-    { id: 4, decision: 'Revisión de políticas', dateIssued: '2025-07-05' },
-  ];
+
+  // Filtramos los datos según el rol
+  const filasGuia = filasCompletas.filter(fila => fila.rol === 'Guía');
+  const filasInformante = filasCompletas.filter(fila => fila.rol === 'Informante');
+  const filasSecretario = filasCompletas.filter(fila => fila.rol === 'Secretario');
+  const filasPresidente = filasCompletas.filter(fila => fila.rol === 'Presidente');
 
   const renderContent = () => {
     switch (value) {
       case 0:
-        return <GuiaContent />;
+        return <GuiaContent rows={filasGuia} />;
       case 1:
-        return <InformanteContent />;
+        return <InformanteContent rows={filasInformante} />;
       case 2:
-        return <SecretarioContent />;
+        return <SecretarioContent rows={filasSecretario} />;
       case 3:
-        return <PresidenteContent columns={presidenteColumns} rows={presidenteRows} />;
+        return <PresidenteContent rows={filasPresidente} />;
       default:
-        return <GuiaContent />;
+        return <GuiaContent rows={filasGuia} />;
     }
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" sx={{ textAlign: 'center', mt: 2 }}>
+    <Box sx={{ width: '100%', pb: 7 }}>
+      <Typography variant="h4" sx={{ textAlign: 'center', mt: 2, mb: 2 }}>
         Gestión De Notas Para Docente
       </Typography>
 
-
-      <Box sx={{ minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed grey', mb: 2 }}>
+      <Box sx={{ minHeight: 'calc(100vh - 150px)', width: '100%' }}>
         {renderContent()}
       </Box>
 
@@ -59,7 +76,7 @@ export default function CustomBottomNavigation() {
         onChange={(event, newValue) => {
           setValue(newValue);
         }}
-        sx={{ width: '100%', position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000 }} // Fixed position at the bottom
+        sx={{ width: '100%', position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000, borderTop: '1px solid #ddd' }}
       >
         <BottomNavigationAction label="Guía" icon={<SchoolIcon />} />
         <BottomNavigationAction label="Informante" icon={<InfoIcon />} />
