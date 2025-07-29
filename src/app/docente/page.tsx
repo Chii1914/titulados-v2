@@ -1,4 +1,3 @@
-// src/app/docente/page.tsx
 "use client";
 import * as React from 'react';
 import Box from '@mui/material/Box';
@@ -15,31 +14,29 @@ import PresidenteContent from './components/presidente';
 import { Typography } from '@mui/material';
 import { GridRowsProp } from '@mui/x-data-grid';
 
-// Interfaz para los datos
 interface FilaGrid {
   id: number;
   nombreAcademico: string;
   rol: 'Guía' | 'Informante' | 'Presidente' | 'Secretario';
   estudianteAsignado: string;
+  rutEstudiante: string;
+  correoEstudiante: string;
   archivoTesis: File | null;
   fechaAsignacion: Date;
 }
 
-// Datos de ejemplo para todos los roles
 const filasCompletas: GridRowsProp<FilaGrid> = [
-  { id: 1, nombreAcademico: 'Dr. Juan Pérez', rol: 'Guía', estudianteAsignado: 'Ana Gómez', archivoTesis: null, fechaAsignacion: new Date('2024-07-28T10:00:00') },
-  { id: 2, nombreAcademico: 'Dr. Juan Pérez', rol: 'Informante', estudianteAsignado: 'Carlos Ruiz', archivoTesis: new File([], "tesis_carlos.pdf"), fechaAsignacion: new Date('2024-07-29T14:30:00') },
-  { id: 3, nombreAcademico: 'Dra. María López', rol: 'Guía', estudianteAsignado: 'Sofía Castro', archivoTesis: new File([], "tesis_sofia.pdf"), fechaAsignacion: new Date('2024-07-20T09:00:00') },
-  { id: 4, nombreAcademico: 'Dra. María López', rol: 'Informante', estudianteAsignado: 'Luis Jara', archivoTesis: new File([], "tesis_luis.pdf"), fechaAsignacion: new Date('2024-07-30T11:00:00') },
-  { id: 5, nombreAcademico: 'Dr. Carlos Soto', rol: 'Presidente', estudianteAsignado: 'Marta Díaz', archivoTesis: new File([], "tesis_marta.pdf"), fechaAsignacion: new Date('2024-08-01T15:00:00') },
-  { id: 6, nombreAcademico: 'Dra. Ana Torres', rol: 'Secretario', estudianteAsignado: 'Pedro Vera', archivoTesis: new File([], "tesis_pedro.pdf"), fechaAsignacion: new Date('2024-08-02T12:00:00') },
+  { id: 1, nombreAcademico: 'Dr. Juan Pérez', rol: 'Guía', estudianteAsignado: 'Ana Gómez', rutEstudiante: '19.876.543-2', correoEstudiante: 'ana.gomez@mail.com', archivoTesis: null, fechaAsignacion: new Date('2024-07-28T10:00:00') },
+  { id: 2, nombreAcademico: 'Dr. Juan Pérez', rol: 'Informante', estudianteAsignado: 'Carlos Ruiz', rutEstudiante: '20.123.456-7', correoEstudiante: 'carlos.ruiz@mail.com', archivoTesis: new File([], "tesis_carlos.pdf"), fechaAsignacion: new Date('2024-07-29T14:30:00') },
+  { id: 3, nombreAcademico: 'Dra. María López', rol: 'Guía', estudianteAsignado: 'Sofía Castro', rutEstudiante: '19.111.222-K', correoEstudiante: 'sofia.castro@mail.com', archivoTesis: new File([], "tesis_sofia.pdf"), fechaAsignacion: new Date('2024-07-20T09:00:00') },
+  { id: 4, nombreAcademico: 'Dra. María López', rol: 'Informante', estudianteAsignado: 'Luis Jara', rutEstudiante: '18.555.666-1', correoEstudiante: 'luis.jara@mail.com', archivoTesis: new File([], "tesis_luis.pdf"), fechaAsignacion: new Date('2024-07-30T11:00:00') },
+  { id: 5, nombreAcademico: 'Dr. Carlos Soto', rol: 'Presidente', estudianteAsignado: 'Marta Díaz', rutEstudiante: '21.333.444-5', correoEstudiante: 'marta.diaz@mail.com', archivoTesis: new File([], "tesis_marta.pdf"), fechaAsignacion: new Date('2024-08-01T15:00:00') },
+  { id: 6, nombreAcademico: 'Dra. Ana Torres', rol: 'Secretario', estudianteAsignado: 'Pedro Vera', rutEstudiante: '20.987.654-3', correoEstudiante: 'pedro.vera@mail.com', archivoTesis: new File([], "tesis_pedro.pdf"), fechaAsignacion: new Date('2024-08-02T12:00:00') },
 ];
-
 
 export default function CustomBottomNavigation() {
   const [value, setValue] = React.useState(0);
 
-  // Filtramos los datos según el rol
   const filasGuia = filasCompletas.filter(fila => fila.rol === 'Guía');
   const filasInformante = filasCompletas.filter(fila => fila.rol === 'Informante');
   const filasSecretario = filasCompletas.filter(fila => fila.rol === 'Secretario');

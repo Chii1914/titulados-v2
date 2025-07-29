@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import { Typography, Button, IconButton } from '@mui/material';
 import { GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { UploadFile, Download, Visibility } from '@mui/icons-material';
-import AcademicoGrid from './AcademicoGrid'; 
+import AcademicoGrid from './AcademicoGrid';
 
 interface GuiaContentProps {
   rows: GridRowsProp;
@@ -11,18 +11,14 @@ interface GuiaContentProps {
 
 function GuiaContent({ rows }: GuiaContentProps) {
   const columnasGuia: GridColDef[] = [
-    { field: 'nombreAcademico', headerName: 'Académico Guía', width: 180 },
-    { field: 'estudianteAsignado', headerName: 'Estudiante Asignado', width: 180 },
-    {
-      field: 'fechaAsignacion',
-      headerName: 'Fecha de Asignación',
-      type: 'dateTime',
-      width: 200,
-    },
+    { field: 'estudianteAsignado', headerName: 'Estudiante', width: 180 },
+    { field: 'rutEstudiante', headerName: 'RUT', width: 120 },
+    { field: 'correoEstudiante', headerName: 'Correo', width: 200 },
+    { field: 'fechaAsignacion', headerName: 'Fecha Asignación', type: 'dateTime', width: 180 },
     {
       field: 'acciones',
       headerName: 'Acciones de Guía',
-      width: 450,
+      width: 350,
       sortable: false,
       renderCell: (params) => (
         <Box>

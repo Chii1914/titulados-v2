@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import { Typography, Button, IconButton } from '@mui/material';
 import { GridColDef, GridRowsProp } from '@mui/x-data-grid';
 import { UploadFile, Download, Visibility } from '@mui/icons-material';
-import AcademicoGrid from './AcademicoGrid'; 
+import AcademicoGrid from './AcademicoGrid';
 
 interface InformanteContentProps {
   rows: GridRowsProp;
@@ -11,24 +11,20 @@ interface InformanteContentProps {
 
 function InformanteContent({ rows }: InformanteContentProps) {
   const columnasInformante: GridColDef[] = [
-    { field: 'nombreAcademico', headerName: 'Académico Informante', width: 180 },
-    { field: 'estudianteAsignado', headerName: 'Estudiante Asignado', width: 180 },
-    {
-      field: 'fechaAsignacion',
-      headerName: 'Fecha de Asignación',
-      type: 'dateTime',
-      width: 200,
-    },
+    { field: 'estudianteAsignado', headerName: 'Estudiante', width: 180 },
+    { field: 'rutEstudiante', headerName: 'RUT', width: 120 },
+    { field: 'correoEstudiante', headerName: 'Correo', width: 200 },
+    { field: 'fechaAsignacion', headerName: 'Fecha Asignación', type: 'dateTime', width: 180 },
     {
       field: 'acciones',
       headerName: 'Acciones de Informante',
-      width: 450,
+      width: 250,
       sortable: false,
       renderCell: (params) => (
         <Box>
           <Button variant="outlined" size="small" sx={{ mr: 1 }}>Poner Nota</Button>
-          <IconButton title="Descargar Rúbrica Informante"><Download /></IconButton>
-          <IconButton title="Subir Rúbrica Informante"><UploadFile /></IconButton>
+          <IconButton title="Descargar Rúbrica"><Download /></IconButton>
+          <IconButton title="Subir Rúbrica"><UploadFile /></IconButton>
           {params.row.archivoTesis && <IconButton title="Ver Tesis"><Visibility /></IconButton>}
         </Box>
       ),
