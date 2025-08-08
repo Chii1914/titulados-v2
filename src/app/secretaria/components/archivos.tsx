@@ -1,20 +1,27 @@
 "use client"; // Required for client-side components in Next.js App Router
 
 import Backdrop from '@mui/material/Backdrop';
-import { Box, Button, Card, CardActionArea, Paper, Typography, Modal, Select, MenuItem, FormControl, InputLabel } from '@mui/material'; // Added Select, MenuItem, FormControl, InputLabel
+import { Box, Button, Card, CardActionArea, Paper, Typography, Modal, Select, MenuItem, FormControl, InputLabel, Snackbar } from '@mui/material'; // Added Select, MenuItem, FormControl, InputLabel
 import React, { useState } from 'react';
 import SingleFileUploadButton from '@/app/components/singleFileButton'; // Ensure this path is correct
 import SendIcon from '@mui/icons-material/Send';
 import UploadFileIcon from '@mui/icons-material/UploadFile'; // Icon for upload action
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import type { GridColDef, GridActionsCellItemProps } from '@mui/x-data-grid';
-
+import axios from 'axios';
+import __url from '@/lib/const';
+import Swal from 'sweetalert2';
+import { useAccessToken } from '../../context/TokenContext';
+import RefreshIcon from '@mui/icons-material/Refresh';
 function Archivos() {
     const [archivoExcel, setArchivoExcel] = useState<File | null>(null);
-    const [selectedStudentIdForUpload, setSelectedStudentIdForUpload] = useState<number | null>(null);
+    const [selectedStudentIdForUpload, setSelectedStudentIdForUpload] = useState<string | null>(null);
     const [openModal, setOpenModal] = useState(false); // Renamed 'open' to 'openModal' for clarity
     const [selectedFileType, setSelectedFileType] = useState<string>(''); // State for selected file type in modal
     const [individualFileToUpload, setIndividualFileToUpload] = useState<File | null>(null); // State for the file chosen in the modal
+    const token = useAccessToken();
+    const [fileInputKey, setFileInputKey] = useState(0); // <-- Add this state
+    const [rows, setRows] = useState<StudentRow[]>([]);
 
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => {
@@ -24,40 +31,74 @@ function Archivos() {
         setSelectedStudentIdForUpload(null); // Reset student ID on close
     };
 
+    interface DataGridProps {
+        rows: StudentRow[];
+        columns: GridColDef<StudentRow>[];
+        pageSizeOptions: number[];
+        initialState: {
+            pagination: {
+                paginationModel: {
+                    pageSize: number;
+                };
+            };
+        };
+        checkboxSelection: boolean;
+        disableRowSelectionOnClick: boolean;
+        getRowId: (row: StudentRow) => string;
+    }
     const handleSendExcelFile = async () => { // Renamed for clarity
         if (archivoExcel) {
-            console.log('Enviando archivo Excel:', archivoExcel.name);
             const formData = new FormData();
             formData.append('file', archivoExcel);
 
-            // Implement your file upload logic here for the Excel file
-            // Example:
-            /*
             try {
-                const response = await fetch('/api/upload-excel', { // Dedicated API endpoint
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Archivo Excel enviado exitosamente:', result);
-                    // Consider using a Material-UI Snackbar for alerts instead of alert()
-                    // alert('Archivo Excel enviado exitosamente!');
-                    setArchivoExcel(null); // Clear the file after successful upload
+                const response = await axios.post(`${__url}/files/upload/alumnos`, formData, { headers: { Authorization: `Bearer ${token}` } });
+                if (response.status) {
+                    const result = response.data;
+                    setSelectedFileType
+                    setArchivoExcel(null);
+                    setFileInputKey(prevKey => prevKey + 1);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: `Archivo Excel enviado exitosamente.`,
+                    });
                 } else {
-                    const errorText = await response.text();
-                    console.error('Error al enviar el archivo Excel:', response.status, errorText);
-                    // alert(`Error al enviar el archivo Excel: ${response.status} - ${errorText}`);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: `Error al enviar el archivo Excel`,
+                    });
+                    console.error('Error al enviar el archivo Excel:', response.status);
+                    setFileInputKey(prevKey => prevKey + 1); // <-- Increment key to reset the child component
+                    setArchivoExcel(null);
+
+
                 }
             } catch (error) {
                 console.error('Error de red al enviar el archivo Excel:', error);
-                // alert('Error de red al enviar el archivo Excel.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error de red al enviar el archivo Excel.',
+                });
+                setFileInputKey(prevKey => prevKey + 1); // <-- Increment key to reset the child component
+                setArchivoExcel(null);
             }
-            */
+            setFileInputKey(prevKey => prevKey + 1); // <-- Increment key to reset the child component
+            setArchivoExcel(null);
+
         } else {
             console.warn('No hay archivo Excel para enviar.');
+            setFileInputKey(prevKey => prevKey + 1); // <-- Increment key to reset the child component
+            setArchivoExcel(null);
+
+
         }
+        setFileInputKey(prevKey => prevKey + 1); // <-- Increment key to reset the child component
+        setArchivoExcel(null);
+
+
     };
 
     const handleExcelFileSelect = (file: File | null) => { // Renamed for clarity
@@ -75,7 +116,7 @@ function Archivos() {
         nombre: string;
         apellido: string;
         segundoApellido: string;
-        correo: string;
+        mail: string;
         rut: string;
     }
 
@@ -84,11 +125,11 @@ function Archivos() {
     }
 
     const columns: GridColDef<StudentRow>[] = [
-        { field: 'id', headerName: 'ID', width: 50 },
         { field: 'nombre', headerName: 'Nombre', width: 130, editable: true },
+        { field: 'segundoNombre', headerName: 'Segundo Nombre', width: 130, editable: true },
         { field: 'apellido', headerName: 'Apellido Paterno', width: 130, editable: true },
         { field: 'segundoApellido', headerName: 'Apellido Materno', width: 130, editable: true },
-        { field: 'correo', headerName: 'Correo', width: 200, editable: true },
+        { field: 'mail', headerName: 'Correo', width: 200, editable: true },
         { field: 'rut', headerName: 'RUT', width: 120, editable: true },
         {
             field: 'actions',
@@ -99,26 +140,45 @@ function Archivos() {
                 <GridActionsCellItem
                     icon={<UploadFileIcon />}
                     label="Subir Documento"
-                    onClick={() => handleClickUpload(params.row.id)} // Simpler click handler
+                    onClick={() => handleClickUpload(params.row.mail)} // Simpler click handler
                     showInMenu
                 />,
             ],
         },
     ];
 
-    const rows = [
-        { id: 1, nombre: 'Juan', apellido: 'Pérez', segundoApellido: 'González', correo: 'juan.perez@example.com', rut: '12.345.678-9' },
-        { id: 2, nombre: 'María', apellido: 'López', segundoApellido: 'Díaz', correo: 'maria.lopez@example.com', rut: '98.765.432-1' },
-        { id: 3, nombre: 'Carlos', apellido: 'Rodríguez', segundoApellido: 'Soto', correo: 'carlos.r@example.com', rut: '11.222.333-4' },
-        { id: 4, nombre: 'Ana', apellido: 'Silva', segundoApellido: 'Muñoz', correo: 'ana.silva@example.com', rut: '22.333.444-5' },
-    ];
-    // --- End DataGrid Columns and Rows ---
+    const fetchStudents = async () => {
+        try {
+            const response = await axios.get(`${__url}/estudiante`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            console.log(response.data);
+            if (response.data && Array.isArray(response.data)) {
+                setRows(response.data);
+            } else {
+                setRows([]);
+            }
+        } catch (error) {
+            console.error('Error fetching students:', error);
+            setRows([]);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchStudents();
+    }, [token]);
+
+    // Button to reload students
+
+    const handleReloadStudents = () => {
+        fetchStudents();
+    };
 
     // Handler for the "Subir Documento" button click within DataGrid
-    const handleClickUpload = (studentId: number) => {
-        setSelectedStudentIdForUpload(studentId);
+    const handleClickUpload = (mail: string) => {
+        setSelectedStudentIdForUpload(mail);
+        console.log(mail)
         handleOpenModal(); // Open the modal
-        console.log(`Acciones para estudiante ID: ${studentId}. Abriendo modal para subir archivo.`);
     };
 
     const handleFileTypeChange = (event: any) => { // Type 'any' for event from Select
@@ -135,39 +195,34 @@ function Archivos() {
     };
 
     const handleUploadIndividualFile = async () => {
+
         if (selectedStudentIdForUpload && selectedFileType && individualFileToUpload) {
-            console.log(`Subiendo ${selectedFileType} para estudiante ID: ${selectedStudentIdForUpload}, Archivo: ${individualFileToUpload.name}`);
-
             const formData = new FormData();
-            formData.append('studentId', selectedStudentIdForUpload.toString());
-            formData.append('fileType', selectedFileType);
             formData.append('file', individualFileToUpload);
+            formData.append('mail', selectedStudentIdForUpload.toString());
+            
 
-            // Implement your individual file upload logic here
-            /*
             try {
-                const response = await fetch('/api/upload-individual-file', { // Dedicated API endpoint
-                    method: 'POST',
-                    body: formData,
+                const response = axios.post(`${__url}/files/upload/${selectedFileType}`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
                 });
+                Swal.fire({
+                    icon: 'success',
+                    title: `Archivo subido correctamente: ${individualFileToUpload.name}`
+                })
 
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Archivo individual subido exitosamente:', result);
-                    // alert('Archivo individual subido exitosamente!');
-                    handleCloseModal(); // Close modal on success
-                } else {
-                    const errorText = await response.text();
-                    console.error('Error al subir archivo individual:', response.status, errorText);
-                    // alert(`Error al subir archivo individual: ${response.status} - ${errorText}`);
-                }
             } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al subir el archivo',
+                    text: `No se pudo subir el archivo: ${individualFileToUpload.name}`,
+                });
                 console.error('Error de red al subir archivo individual:', error);
-                // alert('Error de red al subir archivo individual.');
             }
-            */
-            // Placeholder for successful upload
-            alert(`Archivo "${individualFileToUpload.name}" de tipo "${selectedFileType}" subido para estudiante ID ${selectedStudentIdForUpload}`);
+                        
             handleCloseModal();
 
         } else {
@@ -200,16 +255,20 @@ function Archivos() {
                 <Typography variant="h5" sx={{ mb: 1, fontWeight: 600, textAlign: 'center' }}>
                     Carga de estudiantes vía archivo Excel
                 </Typography>
-                <CardActionArea sx={{ width: '100%', borderRadius: 2, boxShadow: 5, p: 1, mt: 1 }}>
-                    <Typography variant="body1" sx={{ textAlign: 'center', color: 'primary.main', fontWeight: 500 }}>
-                        Descargar plantilla para estudiantes
-                    </Typography>
-                </CardActionArea>
+                <a href="/subida.xlsx" download>
+                    <CardActionArea sx={{ width: '100%', borderRadius: 2, boxShadow: 5, p: 1, mt: 1 }}>
+                        <Typography variant="body1" sx={{ textAlign: 'center', color: 'primary.main', fontWeight: 500 }}>
+                            Descargar plantilla para estudiantes
+                        </Typography>
+                    </CardActionArea>
+                </a>
                 <SingleFileUploadButton
+                    key={fileInputKey}
                     onFileSelect={handleExcelFileSelect}
                     buttonText="Subir archivo de estudiantes en excel (.xlsx, .xls)"
                     acceptedFileTypes=".xlsx, .xls"
                 />
+
                 {archivoExcel && (
                     <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                         <Typography variant="body2" sx={{ color: 'text.primary' }}>
@@ -231,7 +290,7 @@ function Archivos() {
                                 },
                             }}
                         >
-                            Enviar Archivo
+                            Subir Archivo
                         </Button>
                     </Box>
                 )}
@@ -259,19 +318,25 @@ function Archivos() {
                     Aquí puedes subir archivos específicos para cada estudiante.
                 </Typography>
                 {/* DataGrid for manual student data entry/view with actions */}
-                <Box sx={{ height: 400, width: '100%' }}>
+                <Box sx={{ height: '100%', width: '100%' }}>
+                    <Button onClick={handleReloadStudents} startIcon={<RefreshIcon />}>
+                        Recargar Estudiantes
+                    </Button>
                     <DataGrid
                         rows={rows}
                         columns={columns}
-                        pageSizeOptions={[5, 10, 20]}
+                        pageSizeOptions={[10, 20, 30]}
                         initialState={{
                             pagination: {
-                                paginationModel: { pageSize: 5 }
+                                paginationModel: { pageSize: 10 }
                             }
                         }}
-                        checkboxSelection
-                        disableRowSelectionOnClick
+                        checkboxSelection={true}
+                        disableRowSelectionOnClick={true}
+                        getRowId={(row: StudentRow) => row.rut}
+                        showToolbar={true}
                     />
+
                 </Box>
             </Card>
 
@@ -304,17 +369,18 @@ function Archivos() {
                             onChange={handleFileTypeChange}
                         >
                             <MenuItem value=""><em>Selecciona un tipo</em></MenuItem>
-                            <MenuItem value="Ficha de Ingreso">Ficha de Ingreso</MenuItem>
-                            <MenuItem value="Tesis">Tesis</MenuItem>
-                            <MenuItem value="Rubrica Guía">Rubrica Guía</MenuItem>
-                            <MenuItem value="Rubrica Informante">Rubrica Informante</MenuItem>
+                            <MenuItem value="ficha">Ficha de Ingreso</MenuItem>
+                            <MenuItem value="tesis">Tesis</MenuItem>
+                            <MenuItem value="guia">Rubrica Guía</MenuItem>
+                            <MenuItem value="informante">Rubrica Informante</MenuItem>
                         </Select>
                     </FormControl>
 
                     <SingleFileUploadButton
+                        key={fileInputKey}
                         onFileSelect={handleIndividualFileSelect}
                         buttonText={individualFileToUpload ? `Cambiar Archivo: ${individualFileToUpload.name}` : "Seleccionar Archivo"}
-                        acceptedFileTypes=".pdf, .doc, .docx, .xlsx, .xls" // Example accepted types
+                        acceptedFileTypes=".pdf, .doc, .docx, .xlsx, .xls"
                     />
 
                     {individualFileToUpload && (
@@ -339,7 +405,6 @@ function Archivos() {
                     </Box>
                 </Box>
             </Modal>
-
         </Box>
     );
 }

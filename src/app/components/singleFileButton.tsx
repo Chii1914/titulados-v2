@@ -8,7 +8,9 @@ interface SingleFileUploadButtonProps {
     onFileSelect: (file: File | null) => void;
     buttonText?: string;
     acceptedFileTypes?: string;
+    onReset?: () => void; 
 }
+
 
 export default function SingleFileUploadButton({
     onFileSelect,
@@ -18,6 +20,13 @@ export default function SingleFileUploadButton({
     const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const handleReset = () => {
+    setSelectedFileName(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+    onFileSelect(null);
+};
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         if (file) {

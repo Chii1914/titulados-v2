@@ -24,7 +24,8 @@
     "next": "15.3.4",
     "npm": "^11.5.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sweetalert2": "^11.22.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
