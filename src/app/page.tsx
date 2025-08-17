@@ -68,6 +68,7 @@ export default function Home() {
       <meta name="description" content="Confirme su identidad para acceder al sistema de seguimientos académicos UV." />
       {user && (
         <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-12 md:p-24">
+          <Button onClick={() => navigator.clipboard.writeText(token || "")}>copy token</Button>
           <Box sx={{ maxWidth: '450px', width: '100%', mx: 'auto' }}>
             <Paper
               elevation={6}
