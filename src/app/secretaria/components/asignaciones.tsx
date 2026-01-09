@@ -1,6 +1,7 @@
 "use client"; // Required for client-side components in Next.js App Router
 
 import { BottomNavigation, BottomNavigationAction, Box, Card, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import Swal from 'sweetalert2';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -71,6 +72,10 @@ function Asignaciones() {
         setNewAssignment(prev => ({ ...prev, [name as string]: value }));
     };
 
+    const handleSaludar = () => {
+        Swal.fire('hola');
+    };
+
     const handleSubmitAssignment = async () => {
         // Validate required fields
         if (!newAssignment.studentId || !newAssignment.professorId || !newAssignment.rol) {
@@ -137,6 +142,9 @@ function Asignaciones() {
                         <BottomNavigationAction label="Visualizar asignaciones" icon={<VisibilityIcon />} />
                         <BottomNavigationAction label="Generar asignación" icon={<AddBoxIcon />} />
                     </BottomNavigation>
+                    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                        <Button variant="outlined" onClick={handleSaludar}>Saludar</Button>
+                    </Box>
                 </Box>
 
                 {viewValue === 0 && (
