@@ -12,7 +12,7 @@ import Login from "./components/login";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Sistema de seguimientos académicos uv",
+  title: "Sistema de Seminario de Título uv",
   description: "Página de inicio",
 };
 
