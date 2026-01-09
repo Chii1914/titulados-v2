@@ -32,6 +32,9 @@ export default function Home() {
   }
 
   async function handleLogin() {
+
+    router.push("/docente");
+    /*
     try {
       const response = await axios.get(`${__url}/user/validate`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -60,6 +63,7 @@ export default function Home() {
     } catch (error) {
       console.error("Login error:", error);
     }
+      */
   }
 
   return (
